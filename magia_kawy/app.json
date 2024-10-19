@@ -1,7 +1,7 @@
 {
   "expo": {
-    "name": "coffee_app_mobile",
-    "slug": "coffee_app_mobile",
+    "name": "magia_kawy",
+    "slug": "magia_kawy",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
