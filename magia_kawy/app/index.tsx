@@ -1,6 +1,7 @@
 import React from 'react';
-import SignUpScreen from '../screens/SignUpScreen'; 
+import 'react-native-gesture-handler';
+import AppNavigator from '@/navigation/AppNavigator';
 
 export default function Index() {
-  return <SignUpScreen />;
+  return <AppNavigator />;
 }
