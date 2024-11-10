@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import {View, Text, StyleSheet, TouchableOpacity, Image, FlatList, Dimensions, ScrollView, TextInput, Button } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, Image, FlatList, Dimensions, ScrollView, TextInput, Button } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import homeScreenCarouselData from "@/utils/homeScreenCarouselData";
 import colorPalette from "@/utils/colorPalette";
@@ -14,6 +14,7 @@ const HomeScreen = () => {
     const flatListRef = useRef<FlatList>(null);
     const [currentIndex, setCurrentIndex] = useState(0);
 
+    const countries = ['Italy', 'Brazil', 'Colombia', 'Ethiopia', 'Vietnam'];
     interface Product {
         id: number;
         name: string;
@@ -27,10 +28,11 @@ const HomeScreen = () => {
         quantity: number;
         imageBase64: string;
     }
-    
+
     const [searchQuery, setSearchQuery] = useState('');
     const [products, setProducts] = useState<Product[]>([]);
     const [filteredProducts, setFilteredProducts] = useState<Product[]>([]);
+    const [selectedCountry, setSelectedCountry] = useState('');
     useEffect(() => {
         fetchProducts();
     }, []);
@@ -49,6 +51,16 @@ const HomeScreen = () => {
             product.name.toLowerCase().includes(searchQuery.toLowerCase())
         );
         setFilteredProducts(filtered);
+    };
+
+    const handleCountryFilter = (country: string) => {
+        setSelectedCountry(country);
+        if (country === '') {
+            setFilteredProducts(products); // Show all if no country is selected
+        } else {
+            const filtered = products.filter(product => product.countryOfOrigin === country);
+            setFilteredProducts(filtered);
+        }
     };
     const renderProductItem = ({ item }: { item: Product }) => (
         <View style={styles.productTile}>
@@ -75,12 +87,24 @@ const HomeScreen = () => {
         return () => clearTimeout(timeout);
     }, [currentIndex]);
 
-    const renderItem = ({ item}: { item: { id: string; caption: string; image: any } }) => (
+    const renderItem = ({ item }: { item: { id: string; caption: string; image: any } }) => (
         <View style={styles.carouselItem}>
             <Image source={item.image} style={styles.image} />
             <Text style={styles.overlayTitle}>{item.caption}</Text>
         </View>
     );
+
+    const renderCountryButton = ({ item }: { item: string }) => (
+        <TouchableOpacity
+            style={[styles.countryButton, selectedCountry === item && styles.countryButtonSelected]}
+            onPress={() => handleCountryFilter(item)}
+        >
+            <Text style={[styles.countryButtonText, selectedCountry === item && styles.countryButtonTextSelected]}>
+                {item}
+            </Text>
+        </TouchableOpacity>
+    );
+
 
     return (
         <ScrollView style={styles.container}>
@@ -92,12 +116,33 @@ const HomeScreen = () => {
                     </Text>
                 </TouchableOpacity>
             </View>
-           
-            <View style={{marginVertical: 12}}>
+
+            {/* Search Bar */}
+            <View style={styles.searchContainer}>
+                <View style={styles.searchInput}>
+
+                    <TextInput
+                        placeholder="Search for products..."
+                        value={searchQuery}
+                        onChangeText={setSearchQuery}
+                        placeholderTextColor="#A0A0A0"
+                        style={{ flex: 1, color: '#333' }}
+                    />
+                </View>
+                <TouchableOpacity style={styles.filterButton} onPress={handleSearch}>
+                    <Ionicons name="search-outline" size={18} color="#A0A0A0" style={{ marginRight: 5 }} />
+                    <Text style={styles.filterButtonText}>Search</Text>
+                </TouchableOpacity>
+            </View>
+
+            <View style={{ marginVertical: 12 }}>
                 <Text style={[styles.header2, { marginBottom: 12 }]}>
                     Special
                     <Text style={{ color: colorPalette.accent }}> offer</Text>
                 </Text>
+
+
+
                 <View style={styles.carousel}>
                     <FlatList
                         ref={flatListRef}
@@ -124,25 +169,18 @@ const HomeScreen = () => {
                     </View>
                 </View>
             </View>
-           
-            {/* Search Bar */}
-            <View style={styles.searchContainer}>
-    <View style={styles.searchInput}>
-        
-        <TextInput
-            placeholder="Search for products..."
-            value={searchQuery}
-            onChangeText={setSearchQuery}
-            placeholderTextColor="#A0A0A0"
-            style={{ flex: 1, color: '#333' }}
-        />
-    </View>
-    <TouchableOpacity style={styles.filterButton} onPress={handleSearch}>
-    <Ionicons name="search-outline" size={18} color="#A0A0A0" style={{ marginRight: 5 }} />
-        <Text style={styles.filterButtonText}>Search</Text>
-    </TouchableOpacity>
-</View>
-           
+
+
+
+            <FlatList
+                data={countries}
+                renderItem={renderCountryButton}
+                keyExtractor={(item) => item}
+                horizontal
+                showsHorizontalScrollIndicator={false}
+                contentContainerStyle={styles.countryButtonContainer}
+            />
+
             {/* Product List */}
             <View style={{ marginVertical: 12 }}>
                 <FlatList
@@ -287,6 +325,28 @@ const styles = StyleSheet.create({
     addButtonText: {
         color: '#fff',
         fontWeight: 'bold',
+    },
+    countryButtonContainer: {
+        paddingVertical: 10,
+    },
+    countryButton: {
+        paddingVertical: 8,
+        paddingHorizontal: 15,
+        borderRadius: 20,
+        borderWidth: 1,
+        borderColor: '#E0E0E0',
+        marginHorizontal: 5,
+        backgroundColor: '#F5F5F5',
+    },
+    countryButtonSelected: {
+        backgroundColor: '#FFA500',
+    },
+    countryButtonText: {
+        fontSize: 16,
+        color: '#333',
+    },
+    countryButtonTextSelected: {
+        color: '#fff',
     },
 });
 export default HomeScreen;
