@@ -43,7 +43,7 @@ const HomeScreen = () => {
 
     const fetchProducts = async () => {
         try {
-            const response = await axios.get('http://192.168.1.41:8082/api/products');
+            const response = await axios.get('http://<your ip adress>:8082/api/products');
             setProducts(response.data);
             setFilteredProducts(response.data);
         } catch (error) {
