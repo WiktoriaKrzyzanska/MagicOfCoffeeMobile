@@ -1,19 +1,21 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Image, FlatList, Dimensions, ScrollView, TextInput, Button } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
+import { useNavigation, NavigationProp  } from '@react-navigation/native';
 import homeScreenCarouselData from "@/utils/homeScreenCarouselData";
 import colorPalette from "@/utils/colorPalette";
 import CustomMap from "@/components/CustomMap";
 import Ionicons from '@expo/vector-icons/Ionicons';
 import axios from 'axios';
+import { RootStackParamList } from '../navigation/AppNavigator';
 const { width } = Dimensions.get('window');
 const flatListElementWidth = width - 40;
 
 const HomeScreen = () => {
-    const navigation = useNavigation();
+    const navigation = useNavigation<NavigationProp<RootStackParamList>>();
+    // const navigation = useNavigation();
     const flatListRef = useRef<FlatList>(null);
     const [currentIndex, setCurrentIndex] = useState(0);
-
+    const scrollViewRef = useRef<ScrollView>(null);
     const countries = ['Italy', 'Brazil', 'Colombia', 'Ethiopia', 'Vietnam'];
     interface Product {
         id: number;
@@ -56,7 +58,7 @@ const HomeScreen = () => {
     const handleCountryFilter = (country: string) => {
         setSelectedCountry(country);
         if (country === '') {
-            setFilteredProducts(products); // Show all if no country is selected
+            setFilteredProducts(products); 
         } else {
             const filtered = products.filter(product => product.countryOfOrigin === country);
             setFilteredProducts(filtered);
@@ -105,9 +107,12 @@ const HomeScreen = () => {
         </TouchableOpacity>
     );
 
-
+    const scrollToTop = () => {
+        scrollViewRef.current?.scrollTo({ y: 0, animated: true });
+    };
     return (
-        <ScrollView style={styles.container}>
+        <View style={{ flex: 1 }}>
+        <ScrollView ref={scrollViewRef} style={styles.container}>
             <View style={{ marginTop: 12, marginBottom: 24 }}>
                 <TouchableOpacity onPress={() => navigation.navigate('Home')}>
                     <Text style={styles.header1}>
@@ -191,7 +196,7 @@ const HomeScreen = () => {
                     contentContainerStyle={styles.productList}
                 />
             </View>
-            <View>
+            <View style={{ marginBottom:50 }}>
                 <Text style={[styles.header2, { marginBottom: 12 }]}>
                     Our
                     <Text style={{ color: colorPalette.accent }}> providers</Text>
@@ -199,6 +204,17 @@ const HomeScreen = () => {
                 <CustomMap />
             </View>
         </ScrollView>
+        <View style={styles.bottomNav}>
+        <TouchableOpacity style={styles.navButton} onPress={scrollToTop}>
+            <Ionicons name="home-outline" size={24} color={colorPalette.accent} />
+            <Text style={styles.navButtonText}>Home</Text>
+        </TouchableOpacity>
+        <TouchableOpacity style={styles.navButton} onPress={() => navigation.navigate('Cart')}>
+            <Ionicons name="cart-outline" size={24} color="#333" />
+            <Text style={styles.navButtonText}>Cart</Text>
+        </TouchableOpacity>
+    </View>
+</View>
     );
 };
 
@@ -253,7 +269,7 @@ const styles = StyleSheet.create({
     searchContainer: {
         flexDirection: 'row',
         alignItems: 'center',
-        marginBottom: 20,
+        marginBottom: 30,
     },
     searchInput: {
         flex: 1,
@@ -328,6 +344,7 @@ const styles = StyleSheet.create({
     },
     countryButtonContainer: {
         paddingVertical: 10,
+        marginTop: 20,
     },
     countryButton: {
         paddingVertical: 8,
@@ -347,6 +364,30 @@ const styles = StyleSheet.create({
     },
     countryButtonTextSelected: {
         color: '#fff',
+    },
+    bottomNav: {
+        position: 'absolute',
+        bottom: 20,
+        left: 20,
+        right: 20,
+        flexDirection: 'row',
+        justifyContent: 'space-around',
+        backgroundColor: '#FFFFFF',
+        borderRadius: 30,
+        paddingVertical: 10,
+        paddingHorizontal: 20,
+        shadowColor: '#000',
+        shadowOpacity: 0.1,
+        shadowRadius: 10,
+        elevation: 5,
+    },
+    navButton: {
+        alignItems: 'center',
+    },
+    navButtonText: {
+        fontSize: 12,
+        color: '#333',
+        marginTop: 4,
     },
 });
 export default HomeScreen;
