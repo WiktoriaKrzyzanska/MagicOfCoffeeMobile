@@ -18,7 +18,7 @@ const WelcomeScreen = () => {
       });
       console.log('Login success:', response.data);
       Alert.alert('Success', 'Login successful!');
-      navigation.navigate('RejestracjaScreen');
+      navigation.navigate('HomeScreen');
     } catch (error) {
       console.error('Login failed:', error);
       Alert.alert('Error', 'Login failed. Please check your credentials.');
