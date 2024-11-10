@@ -1,10 +1,11 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Image, FlatList, Dimensions, ScrollView, TextInput, Button } from 'react-native';
-import { useNavigation, NavigationProp  } from '@react-navigation/native';
+import { useNavigation, NavigationProp } from '@react-navigation/native';
 import homeScreenCarouselData from "@/utils/homeScreenCarouselData";
 import colorPalette from "@/utils/colorPalette";
 import CustomMap from "@/components/CustomMap";
 import Ionicons from '@expo/vector-icons/Ionicons';
+import { useDarkMode } from '@/contexts/DarkModeProvider';
 import axios from 'axios';
 import { RootStackParamList } from '../navigation/AppNavigator';
 const { width } = Dimensions.get('window');
@@ -16,6 +17,7 @@ const HomeScreen = () => {
     const flatListRef = useRef<FlatList>(null);
     const [currentIndex, setCurrentIndex] = useState(0);
     const scrollViewRef = useRef<ScrollView>(null);
+    const { isDarkMode, toggleDarkMode } = useDarkMode();
     const countries = ['Italy', 'Brazil', 'Colombia', 'Ethiopia', 'Vietnam'];
     interface Product {
         id: number;
@@ -58,18 +60,18 @@ const HomeScreen = () => {
     const handleCountryFilter = (country: string) => {
         setSelectedCountry(country);
         if (country === '') {
-            setFilteredProducts(products); 
+            setFilteredProducts(products);
         } else {
             const filtered = products.filter(product => product.countryOfOrigin === country);
             setFilteredProducts(filtered);
         }
     };
     const renderProductItem = ({ item }: { item: Product }) => (
-        <View style={styles.productTile}>
+        <View style={[styles.productTile, isDarkMode && styles.productTileDark]}>
             <Image source={{ uri: `data:image/png;base64,${item.imageBase64}` }} style={styles.productImage} />
-            <Text style={styles.productName}>{item.name}</Text>
+            <Text style={[styles.productName, isDarkMode && styles.productNameDark]}>{item.name}</Text>
             <Text style={styles.productDescription}>{item.description}</Text>
-            <Text style={styles.productPrice}>${item.price.toFixed(2)}</Text>
+            <Text style={[styles.productPrice, isDarkMode && styles.productPriceDark]}>${item.price.toFixed(2)}</Text>
             <TouchableOpacity style={styles.addButton}>
                 <Text style={styles.addButtonText}>+</Text>
             </TouchableOpacity>
@@ -111,110 +113,121 @@ const HomeScreen = () => {
         scrollViewRef.current?.scrollTo({ y: 0, animated: true });
     };
     return (
-        <View style={{ flex: 1 }}>
-        <ScrollView ref={scrollViewRef} style={styles.container}>
-            <View style={{ marginTop: 12, marginBottom: 24 }}>
-                <TouchableOpacity onPress={() => navigation.navigate('Home')}>
-                    <Text style={styles.header1}>
-                        MagicOf
-                        <Text style={{ color: colorPalette.accent }}>Coffee</Text>
-                    </Text>
-                </TouchableOpacity>
-            </View>
+        <View style={[styles.container, isDarkMode && styles.containerDark]}>
+            <ScrollView ref={scrollViewRef} >
 
-            {/* Search Bar */}
-            <View style={styles.searchContainer}>
-                <View style={styles.searchInput}>
 
-                    <TextInput
-                        placeholder="Search for products..."
-                        value={searchQuery}
-                        onChangeText={setSearchQuery}
-                        placeholderTextColor="#A0A0A0"
-                        style={{ flex: 1, color: '#333' }}
-                    />
+
+                <View style={{ marginTop: 12, marginBottom: 24 }}>
+                    <TouchableOpacity onPress={() => navigation.navigate('Home')}>
+                        <Text style={[styles.header1, isDarkMode && styles.header1Dark]}>
+                            MagicOf
+                            <Text style={{ color: colorPalette.accent }}>Coffee</Text>
+                        </Text>
+                    </TouchableOpacity>
                 </View>
-                <TouchableOpacity style={styles.filterButton} onPress={handleSearch}>
-                    <Ionicons name="search-outline" size={18} color="#A0A0A0" style={{ marginRight: 5 }} />
-                    <Text style={styles.filterButtonText}>Search</Text>
-                </TouchableOpacity>
-            </View>
-
-            <View style={{ marginVertical: 12 }}>
-                <Text style={[styles.header2, { marginBottom: 12 }]}>
-                    Special
-                    <Text style={{ color: colorPalette.accent }}> offer</Text>
-                </Text>
 
 
+                {/* Search Bar */}
+                <View style={styles.searchContainer}>
+                    <View style={styles.searchInput}>
 
-                <View style={styles.carousel}>
-                    <FlatList
-                        ref={flatListRef}
-                        data={homeScreenCarouselData}
-                        renderItem={renderItem}
-                        keyExtractor={(item) => item.id}
-                        horizontal
-                        pagingEnabled
-                        showsHorizontalScrollIndicator={false}
-                        getItemLayout={(_, index) => (
-                            { length: flatListElementWidth, offset: (flatListElementWidth) * index, index }
-                        )}
-                        onMomentumScrollEnd={(event) => {
-                            setCurrentIndex(Math.round(event.nativeEvent.contentOffset.x / width));
-                        }}
-                    />
-                    <View style={styles.dotsContainer}>
-                        {homeScreenCarouselData.map((_, index) => (
-                            <View key={index} style={[
-                                styles.dot,
-                                { backgroundColor: index === currentIndex ? colorPalette.accent : colorPalette.disabled }
-                            ]} />
-                        ))}
+                        <TextInput
+                            placeholder="Search for products..."
+                            value={searchQuery}
+                            onChangeText={setSearchQuery}
+                            placeholderTextColor="#A0A0A0"
+                            style={{ flex: 1, color: '#333' }}
+                        />
+                    </View>
+                    <TouchableOpacity style={styles.filterButton} onPress={handleSearch}>
+                        <Ionicons name="search-outline" size={18} color="#A0A0A0" style={{ marginRight: 5 }} />
+                        <Text style={styles.filterButtonText}>Search</Text>
+                    </TouchableOpacity>
+                </View>
+
+                <View style={{ marginVertical: 12 }}>
+                    <Text style={[styles.header2, isDarkMode && styles.header2Dark]}>
+                        Special
+                        <Text style={{ color: colorPalette.accent }}> offer</Text>
+                    </Text>
+
+
+
+                    <View style={styles.carousel}>
+                        <FlatList
+                            ref={flatListRef}
+                            data={homeScreenCarouselData}
+                            renderItem={renderItem}
+                            keyExtractor={(item) => item.id}
+                            horizontal
+                            pagingEnabled
+                            showsHorizontalScrollIndicator={false}
+                            getItemLayout={(_, index) => (
+                                { length: flatListElementWidth, offset: (flatListElementWidth) * index, index }
+                            )}
+                            onMomentumScrollEnd={(event) => {
+                                setCurrentIndex(Math.round(event.nativeEvent.contentOffset.x / width));
+                            }}
+                        />
+                        <View style={styles.dotsContainer}>
+                            {homeScreenCarouselData.map((_, index) => (
+                                <View key={index} style={[
+                                    styles.dot,
+                                    { backgroundColor: index === currentIndex ? colorPalette.accent : colorPalette.disabled }
+                                ]} />
+                            ))}
+                        </View>
                     </View>
                 </View>
-            </View>
 
 
 
-            <FlatList
-                data={countries}
-                renderItem={renderCountryButton}
-                keyExtractor={(item) => item}
-                horizontal
-                showsHorizontalScrollIndicator={false}
-                contentContainerStyle={styles.countryButtonContainer}
-            />
-
-            {/* Product List */}
-            <View style={{ marginVertical: 12 }}>
                 <FlatList
-                    data={filteredProducts}
-                    renderItem={renderProductItem}
-                    keyExtractor={(item) => item.id.toString()}
-                    numColumns={2}
-                    contentContainerStyle={styles.productList}
+                    data={countries}
+                    renderItem={renderCountryButton}
+                    keyExtractor={(item) => item}
+                    horizontal
+                    showsHorizontalScrollIndicator={false}
+                    contentContainerStyle={styles.countryButtonContainer}
                 />
+
+                {/* Product List */}
+                <View style={{ marginVertical: 12 }}>
+                    <FlatList
+                        data={filteredProducts}
+                        renderItem={renderProductItem}
+                        keyExtractor={(item) => item.id.toString()}
+                        numColumns={2}
+                        contentContainerStyle={styles.productList}
+                    />
+                </View>
+                <View style={{ marginBottom: 50 }}>
+                    <Text style={[styles.header2, isDarkMode && styles.header2Dark]}>
+                        Our
+                        <Text style={{ color: colorPalette.accent }}> providers</Text>
+                    </Text>
+                    <CustomMap />
+                </View>
+            </ScrollView>
+            <View style={[styles.bottomNav, isDarkMode && styles.bottomNavDark]}>
+                <TouchableOpacity style={styles.navButton} onPress={scrollToTop}>
+                    <Ionicons name="home-outline" size={24} color={isDarkMode ? '#FFD700' : '#333'} />
+                    <Text style={[styles.navButtonText, isDarkMode && styles.navButtonTextDark]}>Home</Text>
+                </TouchableOpacity>
+
+                <TouchableOpacity onPress={toggleDarkMode} style={styles.navButton}>
+                    <Ionicons name={isDarkMode ? 'sunny-outline' : 'moon-outline'} size={24} color={isDarkMode ? '#FFD700' : '#333'} />
+                    <Text style={[styles.navButtonText, isDarkMode && styles.navButtonTextDark]}>Theme</Text>
+                </TouchableOpacity>
+
+                <TouchableOpacity style={styles.navButton} onPress={() => navigation.navigate('Cart')}>
+                    <Ionicons name="cart-outline" size={24} color={isDarkMode ? '#FFD700' : '#333'} />
+                    <Text style={[styles.navButtonText, isDarkMode && styles.navButtonTextDark]}>Cart</Text>
+                </TouchableOpacity>
+
             </View>
-            <View style={{ marginBottom:50 }}>
-                <Text style={[styles.header2, { marginBottom: 12 }]}>
-                    Our
-                    <Text style={{ color: colorPalette.accent }}> providers</Text>
-                </Text>
-                <CustomMap />
-            </View>
-        </ScrollView>
-        <View style={styles.bottomNav}>
-        <TouchableOpacity style={styles.navButton} onPress={scrollToTop}>
-            <Ionicons name="home-outline" size={24} color={colorPalette.accent} />
-            <Text style={styles.navButtonText}>Home</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.navButton} onPress={() => navigation.navigate('Cart')}>
-            <Ionicons name="cart-outline" size={24} color="#333" />
-            <Text style={styles.navButtonText}>Cart</Text>
-        </TouchableOpacity>
-    </View>
-</View>
+        </View>
     );
 };
 
@@ -224,15 +237,26 @@ const styles = StyleSheet.create({
         padding: 20,
         backgroundColor: colorPalette.background,
     },
+    containerDark: {
+        backgroundColor: '#333333',
+    },
+
     header1: {
         fontSize: 32,
         color: colorPalette.primary,
         fontFamily: 'Righteous_400Regular',
     },
+    header1Dark: {
+        color: '#FFFFFF',
+    },
     header2: {
         fontSize: 24,
         color: colorPalette.primary,
         fontFamily: 'Righteous_400Regular',
+        marginBottom: 12,
+    },
+    header2Dark: {
+        color: '#FFFFFF',
     },
     carousel: {
         width: '100%',
@@ -313,6 +337,14 @@ const styles = StyleSheet.create({
         elevation: 3,
         alignItems: 'center',
     },
+    productTileDark: {
+        backgroundColor: '#333333',
+        borderColor: '#fff',
+        borderWidth: 1,
+
+    },
+
+
     productImage: {
         width: '100%',
         height: 100,
@@ -323,6 +355,9 @@ const styles = StyleSheet.create({
         fontWeight: 'bold',
         marginTop: 5,
     },
+    productNameDark: {
+        color: '#fff',
+    },
     productDescription: {
         fontSize: 12,
         color: '#666',
@@ -331,6 +366,10 @@ const styles = StyleSheet.create({
         fontSize: 16,
         color: colorPalette.primary,
         marginTop: 5,
+    },
+    productPriceDark: {
+
+        color: '#fff',
     },
     addButton: {
         backgroundColor: colorPalette.accent,
@@ -388,6 +427,13 @@ const styles = StyleSheet.create({
         fontSize: 12,
         color: '#333',
         marginTop: 4,
+    },
+    bottomNavDark: {
+        backgroundColor: '#444444',
+    },
+
+    navButtonTextDark: {
+        color: '#FFD700',
     },
 });
 export default HomeScreen;

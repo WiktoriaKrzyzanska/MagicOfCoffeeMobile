@@ -4,6 +4,7 @@ import AppNavigator from '@/navigation/AppNavigator';
 import { useFonts, Righteous_400Regular } from '@expo-google-fonts/righteous';
 import {View} from "react-native";
 import LottieView from "lottie-react-native";
+import { DarkModeProvider } from '@/contexts/DarkModeProvider'
 
 export default function Index() {
   let [fontsLoaded] = useFonts({
@@ -22,5 +23,9 @@ export default function Index() {
       </View>
     );
   }
-  return <AppNavigator />;
+  return (
+    <DarkModeProvider>
+    <AppNavigator />
+    </DarkModeProvider>
+  ) ;
 }
