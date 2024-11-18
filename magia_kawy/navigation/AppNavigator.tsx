@@ -4,6 +4,12 @@ import WelcomeScreen from '../screens/WelcomeScreen';
 import RejestracjaScreen from '../screens/RejestracjaScreen';
 import HomeScreen from '../screens/HomeScreen';
 
+
+export type RootStackParamList = {
+  Welcome: undefined;
+  RejestracjaScreen: undefined;
+  Home: undefined;
+};
 const Stack = createStackNavigator();
 
 const AppNavigator = () => {
