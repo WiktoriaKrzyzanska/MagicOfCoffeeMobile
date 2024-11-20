@@ -496,7 +496,7 @@ const HomeScreen = () => {
 
         <TouchableOpacity
           style={styles.navButton}
-          onPress={() => navigation.navigate("Cart")}
+          onPress={() => navigation.navigate("CartScreen")}
         >
           <Ionicons
             name="cart-outline"
