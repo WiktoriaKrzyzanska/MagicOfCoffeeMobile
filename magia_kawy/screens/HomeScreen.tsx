@@ -257,7 +257,7 @@ const HomeScreen = () => {
   const fetchProducts = async () => {
     try {
       const response = await axios.get(
-        "http://192.168.8.103:8082/api/products"
+        "http://xxx.xxx.xxx:8082/api/products"
       );
       setProducts(response.data);
       setFilteredProducts(response.data);
