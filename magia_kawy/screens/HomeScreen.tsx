@@ -273,16 +273,18 @@ const HomeScreen = () => {
   };
 
   const handleCountryFilter = (country: string) => {
-    setSelectedCountry(country);
-    if (country === "") {
+    if (selectedCountry === country) {
+      setSelectedCountry("");
       setFilteredProducts(products);
     } else {
+      setSelectedCountry(country);
       const filtered = products.filter(
         (product) => product.countryOfOrigin === country
       );
       setFilteredProducts(filtered);
     }
   };
+
   const renderProductItem = ({ item }: { item: Product }) => (
     <View style={[styles.productTile, isDarkMode && styles.productTileDark]}>
       <Image
