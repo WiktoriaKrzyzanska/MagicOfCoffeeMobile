@@ -160,8 +160,9 @@ const styles = StyleSheet.create({
   },
   addButton: {
     backgroundColor: colorPalette.accent,
-    padding: 10,
-    borderRadius: 20,
+    paddingHorizontal: 20,
+    paddingVertical: 10,
+    borderRadius: 50,
     marginTop: 10,
   },
   addButtonText: {
@@ -256,7 +257,7 @@ const HomeScreen = () => {
   const fetchProducts = async () => {
     try {
       const response = await axios.get(
-        "http://xxx.xxxx.xxx.xxx:8082/api/products"
+        "http://xxx.xxx.xxx:8082/api/products"
       );
       setProducts(response.data);
       setFilteredProducts(response.data);
@@ -272,16 +273,18 @@ const HomeScreen = () => {
   };
 
   const handleCountryFilter = (country: string) => {
-    setSelectedCountry(country);
-    if (country === "") {
+    if (selectedCountry === country) {
+      setSelectedCountry("");
       setFilteredProducts(products);
     } else {
+      setSelectedCountry(country);
       const filtered = products.filter(
         (product) => product.countryOfOrigin === country
       );
       setFilteredProducts(filtered);
     }
   };
+
   const renderProductItem = ({ item }: { item: Product }) => (
     <View style={[styles.productTile, isDarkMode && styles.productTileDark]}>
       <Image
