@@ -1,7 +1,7 @@
 import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-const API_BASE_URL = 'http://192.168.0.107:8082/coffee/cart';
+const API_BASE_URL = 'http://xxx.xxx.xxx:8082/coffee/cart';
 
 const getToken = async () => {
   try {
