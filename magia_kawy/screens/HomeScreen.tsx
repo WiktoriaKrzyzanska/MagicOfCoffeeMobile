@@ -18,6 +18,9 @@ import Ionicons from "@expo/vector-icons/Ionicons";
 import { useDarkMode } from "@/contexts/DarkModeProvider";
 import axios from "axios";
 import { RootStackParamList } from "../navigation/AppNavigator";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { Alert } from "react-native";
+
 const { width } = Dimensions.get("window");
 const flatListElementWidth = width - 40;
 
@@ -245,7 +248,43 @@ const HomeScreen = () => {
     quantity: number;
     imageBase64: string;
   }
-
+  const [cart, setCart] = useState<Product[]>([]);
+  const addToCart = async (product: Product) => {
+    try {
+      const token = await AsyncStorage.getItem("authToken");
+      const userId = await AsyncStorage.getItem("userId");
+  
+      if (!token || !userId) {
+        console.error("Brak tokena lub ID użytkownika");
+        return;
+      }
+  
+      const response = await axios.post(
+        "http://xxx.xxx.xxx.xxx:8082/coffee/cart/add",
+        {
+          userId: userId, 
+          productId: product.id, 
+          quantity: 1, 
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`, 
+            "Content-Type": "application/json",
+          },
+        }
+      );
+  
+      if (response.status === 200) {
+        Alert.alert("Sukces", `${product.name} dodano do koszyka!`);
+      } else {
+        console.error("Błąd dodawania do koszyka:", response.data);
+      }
+    } catch (error) {
+      console.error("Błąd podczas dodawania do koszyka:", error);
+      Alert.alert("Błąd", "Nie udało się dodać produktu do koszyka.");
+    }
+  };
+  
   const [searchQuery, setSearchQuery] = useState("");
   const [products, setProducts] = useState<Product[]>([]);
   const [filteredProducts, setFilteredProducts] = useState<Product[]>([]);
@@ -257,7 +296,7 @@ const HomeScreen = () => {
   const fetchProducts = async () => {
     try {
       const response = await axios.get(
-        "http://xxx.xxx.xxx:8082/api/products"
+        "http://xxx.xxx.xxx.xxx:8082/api/products"
       );
       setProducts(response.data);
       setFilteredProducts(response.data);
@@ -300,7 +339,7 @@ const HomeScreen = () => {
       >
         ${item.price.toFixed(2)}
       </Text>
-      <TouchableOpacity style={styles.addButton}>
+      <TouchableOpacity style={styles.addButton} onPress={() => addToCart(item)}>
         <Text style={styles.addButtonText}>+</Text>
       </TouchableOpacity>
     </View>
