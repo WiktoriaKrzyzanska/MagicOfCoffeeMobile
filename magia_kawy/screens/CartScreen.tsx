@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, FlatList, StyleSheet, TouchableOpacity, Alert, Modal, Image, Pressable } from 'react-native';
+import { View, Text, FlatList, StyleSheet, TouchableOpacity, Alert, Modal, Image, Pressable, Linking } from 'react-native';
 import { getCart, updateQuantity,removeFromCart } from '../utils/cartUtils';
 import { useDarkMode } from '@/contexts/DarkModeProvider'; 
 
@@ -67,8 +67,13 @@ const CartScreen: React.FC<CartScreenProps> = ({ userId }) => {
     setModalVisible(true);
   };
 
-  const handlePayment = () => {
-    Alert.alert('Przejdź do płatności', 'Funkcja płatności wkrótce będzie dostępna.');
+  const handlePayment = async () => {
+    const paymentLink = 'https://buy.stripe.com/xxxx';  
+    try {
+      await Linking.openURL(paymentLink);  
+    } catch (error) {
+      console.error('Error opening payment URL:', error);
+    }
   };
   const renderItem = ({ item }: { item: CartItem }) => (
     <TouchableOpacity onPress={() => handleItemPress(item)}>

@@ -104,7 +104,7 @@ export default function RejestracjaScreen() {
 
     try {
       const response = await axios.post(
-        "http://xxx.xxx.xxx.xxx:8082/auth/signup",
+        "http://xxx.xxx.xxx:8082/auth/signup",
         {
           email,
           password,
