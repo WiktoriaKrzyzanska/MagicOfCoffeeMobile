@@ -82,7 +82,7 @@ const WelcomeScreen = () => {
   const handleLogin = async () => {
     try {
       const response = await axios.post(
-        "http:/xxx.xxx.xxx:8082/auth/signin",
+        "http://xxx.xxx.xxx:8082/auth/signin",
         {
           email: email,
           password: password,
