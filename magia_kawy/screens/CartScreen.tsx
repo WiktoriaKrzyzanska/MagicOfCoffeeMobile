@@ -1,8 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, FlatList, StyleSheet, TouchableOpacity, Alert, Modal, Image, Pressable } from 'react-native';
-import { getCart } from '../utils/cartUtils';
+import { getCart, updateQuantity,removeFromCart } from '../utils/cartUtils';
 import { useDarkMode } from '@/contexts/DarkModeProvider'; 
-
 
 interface CartItem {
   id: string;
@@ -71,20 +70,60 @@ const CartScreen: React.FC<CartScreenProps> = ({ userId }) => {
   const handlePayment = () => {
     Alert.alert('Przejdź do płatności', 'Funkcja płatności wkrótce będzie dostępna.');
   };
-
   const renderItem = ({ item }: { item: CartItem }) => (
     <TouchableOpacity onPress={() => handleItemPress(item)}>
-      <View style={[styles.cartItem, isDarkMode ? styles.cartItemDarkMode : null]}>
+    <View style={[styles.cartItem, isDarkMode ? styles.cartItemDarkMode : null]}>
+      <View style={styles.productInfo}>
         <Text style={[styles.productName, isDarkMode ? styles.productNameDarkMode : null]}>{item.name}</Text>
-        <Text style={[styles.quantityText, isDarkMode ? styles.quantityTextDarkMode : null]}>
-          Ilość: {item.quantity}
-        </Text>
         <Text style={[styles.productPrice, isDarkMode ? styles.productPriceDarkMode : null]}>
           {item.price.toFixed(2)} zł
         </Text>
+        <Text style={[styles.quantityText, isDarkMode ? styles.quantityTextDarkMode : null]}>
+          Ilość: {item.quantity}
+        </Text>
       </View>
+  
+      <View style={styles.actionButtons}>
+        <TouchableOpacity
+          style={[styles.quantityButton, styles.increaseButton]}
+          onPress={async () => {
+            await updateQuantity({ productId: item.productId, quantity: item.quantity + 1 });
+            fetchCart(); 
+          }}
+        >
+          <Text style={styles.quantityButtonText}>+</Text>
+        </TouchableOpacity>
+  
+        <TouchableOpacity
+          style={[styles.quantityButton, styles.decreaseButton]}
+          onPress={async () => {
+            if (item.quantity > 1) {
+              await updateQuantity({ productId: item.productId, quantity: item.quantity - 1 });
+              fetchCart();
+            } else {
+              Alert.alert('Ostrzeżenie', 'Aby usunąć produkt, użyj przycisku "Usuń".');
+            }
+          }}
+        >
+          <Text style={styles.quantityButtonText}>-</Text>
+        </TouchableOpacity>
+  
+        <TouchableOpacity
+          style={styles.removeButton}
+          onPress={async () => {
+            await removeFromCart({ productId: item.productId });
+            fetchCart(); 
+          }}
+        >
+          <Text style={styles.removeButtonText}>Usuń</Text>
+        </TouchableOpacity>
+      </View>
+    </View>
     </TouchableOpacity>
+
   );
+  
+  
 
   if (!cart || cart.items.length === 0) {
     return (
@@ -173,18 +212,31 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    backgroundColor: '#333',
+    backgroundColor: '#FFF',
     padding: 15,
     marginBottom: 10,
     borderRadius: 10,
+    shadowColor: '#000',
+    shadowOpacity: 0.1,
+    shadowRadius: 5,
+    elevation: 3,
   },
   cartItemDarkMode: {
     backgroundColor: '#FFA500',
   },
   productName: {
-    fontSize: 16,
-    color: '#FFA500',
-    flex: 2,
+    fontSize: 18,
+    fontWeight: 'bold',
+    marginBottom: 5,
+    color: '#000',
+  },
+  productNameDarkMode: {
+    color: '#FFF',
+  },
+  productInfo: {
+    flex: 1,
+    justifyContent: 'space-between',
+    alignItems: 'flex-start',
   },
   modalSeparator: { 
     height: 1, 
@@ -216,27 +268,28 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     textAlign: 'center',
   },  
-  productNameDarkMode: {
-    color: '#000',
+  productPriceDarkMode: {
+    color: '#FFD700',
   },
   quantityText: {
     fontSize: 16,
-    color: '#FFF',
-    flex: 1,
-    textAlign: 'center',
+    color: '#666',
   },
   quantityTextDarkMode: {
-    color: '#000',
+    color: '#DDD',
+  },
+  quantityButton: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginHorizontal: 5,
   },
   productPrice: {
     fontSize: 16,
-    fontWeight: 'bold',
-    color: '#FFF',
-    flex: 1,
-    textAlign: 'right',
-  },
-  productPriceDarkMode: {
-    color: '#000',
+    color: '#FFA500',
+    marginBottom: 5,
   },
   totalPriceContainer: {
     flexDirection: 'row',
@@ -316,6 +369,33 @@ const styles = StyleSheet.create({
   },
   modalDetailDarkMode: {
     color: '#000',
+  },
+  actionButtons: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-around',
+  },
+  removeButton: {
+    padding: 10,
+    backgroundColor: '#FF5722',
+    borderRadius: 5,
+    marginLeft: 10,
+  },
+  removeButtonText: {
+    color: '#FFF',
+    fontWeight: 'bold',
+    fontSize: 14,
+  },
+  increaseButton: {
+    backgroundColor: '#4CAF50', 
+  },
+  decreaseButton: {
+    backgroundColor: '#F44336', 
+  },
+    quantityButtonText: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    color: '#FFF',
   }
 });
 

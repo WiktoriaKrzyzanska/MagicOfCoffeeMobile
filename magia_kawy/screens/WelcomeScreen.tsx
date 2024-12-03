@@ -12,6 +12,7 @@ import { useNavigation } from "@react-navigation/native";
 import { FontAwesome } from "@expo/vector-icons";
 import axios from "axios";
 import * as AuthSession from "expo-auth-session";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const WelcomeScreen = () => {
   const navigation = useNavigation();
@@ -46,7 +47,7 @@ const WelcomeScreen = () => {
       const fetchAccessTokenAndUser = async () => {
         try {
           const { code } = response.params;
-
+      
           const tokenResponse = await axios.post(
             "https://github.com/login/oauth/access_token",
             {
@@ -57,19 +58,22 @@ const WelcomeScreen = () => {
             },
             { headers: { Accept: "application/json" } }
           );
-
+      
           const { access_token } = tokenResponse.data;
-
+      
+          await AsyncStorage.setItem("authToken", access_token);
+      
           const userResponse = await axios.get("https://api.github.com/user", {
             headers: { Authorization: `Bearer ${access_token}` },
           });
-
+      
           Alert.alert("Success", `Welcome, ${userResponse.data.login}`);
         } catch (error) {
           console.error("GitHub Login Error:", error);
           Alert.alert("Error", "GitHub login failed.");
         }
       };
+      
 
       fetchAccessTokenAndUser();
     }
@@ -84,8 +88,21 @@ const WelcomeScreen = () => {
           password: password,
         }
       );
+      await AsyncStorage.setItem("authToken", response.data);
+
+      const idResponse = await axios.get(
+        "http://xxx.xxx.xxx.xxx:8082/user/id",
+        {
+          headers: {
+            Authorization: `Bearer ${response.data}`,
+          },
+        }
+      );
+
+      await AsyncStorage.setItem("userId", idResponse.data.toString()); 
       console.log("Login success:", response.data);
       Alert.alert("Success", "Login successful!");
+
       navigation.navigate("HomeScreen");
     } catch (error) {
       console.error("Login failed:", error);
