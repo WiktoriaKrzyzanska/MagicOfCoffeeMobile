@@ -82,7 +82,7 @@ const WelcomeScreen = () => {
   const handleLogin = async () => {
     try {
       const response = await axios.post(
-        "http://xxx.xxx.xxx.xxx:8082/auth/signin",
+        "http:/xxx.xxx.xxx:8082/auth/signin",
         {
           email: email,
           password: password,
@@ -91,7 +91,7 @@ const WelcomeScreen = () => {
       await AsyncStorage.setItem("authToken", response.data);
 
       const idResponse = await axios.get(
-        "http://xxx.xxx.xxx.xxx:8082/user/id",
+        "http://xxx.xxx.xxx:8082/user/id",
         {
           headers: {
             Authorization: `Bearer ${response.data}`,

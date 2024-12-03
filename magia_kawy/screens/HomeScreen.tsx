@@ -260,7 +260,7 @@ const HomeScreen = () => {
       }
   
       const response = await axios.post(
-        "http://xxx.xxx.xxx.xxx:8082/coffee/cart/add",
+        "http://xxx.xxx.xxx:8082/coffee/cart/add",
         {
           userId: userId, 
           productId: product.id, 
@@ -296,7 +296,7 @@ const HomeScreen = () => {
   const fetchProducts = async () => {
     try {
       const response = await axios.get(
-        "http://xxx.xxx.xxx.xxx:8082/api/products"
+        "http://xxx.xxx.xxx:8082/api/products"
       );
       setProducts(response.data);
       setFilteredProducts(response.data);
