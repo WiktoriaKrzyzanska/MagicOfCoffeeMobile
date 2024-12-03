@@ -13,11 +13,16 @@ import { Shadow } from "react-native-shadow-2";
 import LottieView from "lottie-react-native";
 import axios from "axios";
 import BouncyCheckbox from "react-native-bouncy-checkbox";
+import FontAwesome from "@expo/vector-icons/build/FontAwesome";
+import { useNavigation, NavigationProp } from "@react-navigation/native";
+
 
 const { height: screenHeight } = Dimensions.get("window");
 
 export default function RejestracjaScreen() {
+  const navigation = useNavigation<NavigationProp<RootStackParamList>>();
   const [passwordVisible, setPasswordVisible] = useState(false);
+  const [passwordConfrimVisible, setPasswordConfrimVisible] = useState(false);
   const [showThankYou, setShowThankYou] = useState(false);
   const [showErrorModal, setShowErrorModal] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
@@ -213,10 +218,14 @@ export default function RejestracjaScreen() {
               onChangeText={setPassword}
             />
             <TouchableOpacity
-              style={styles.eyeIconContainer}
-              onPress={togglePasswordVisibility}
+              style={styles.eyeIcon}
+              onPress={() => setPasswordVisible(!passwordVisible)}
             >
-              <Text>{passwordVisible ? "🙈" : "👁️"}</Text>
+              <FontAwesome
+                name={passwordVisible ? "eye-slash" : "eye"}
+                size={24}
+                color="#666"
+              />
             </TouchableOpacity>
           </View>
           {passwordError ? (
@@ -228,11 +237,21 @@ export default function RejestracjaScreen() {
           <TextInput
             style={styles.input}
             placeholder="********"
-            secureTextEntry={!passwordVisible}
+            secureTextEntry={!passwordConfrimVisible}
             placeholderTextColor="#999"
             value={confirmPassword}
             onChangeText={setConfirmPassword}
           />
+          <TouchableOpacity
+            style={styles.eyeIcon2}
+            onPress={() => setPasswordConfrimVisible(!passwordConfrimVisible)}
+          >
+            <FontAwesome
+              name={passwordConfrimVisible ? "eye-slash" : "eye"}
+              size={24}
+              color="#666"
+            />
+          </TouchableOpacity>
           {passwordError ? (
             <Text style={styles.errorText}>{passwordError}</Text>
           ) : null}
@@ -264,12 +283,11 @@ export default function RejestracjaScreen() {
         >
           <Text style={styles.signUpButtonText}>Sign up</Text>
         </TouchableOpacity>
-        <Text style={styles.orText}>Or</Text>
-        <TouchableOpacity style={styles.facebookButton}>
-          <Text style={styles.facebookButtonText}>Sign up with Facebook</Text>
-        </TouchableOpacity>
         <Text style={styles.loginText}>
-          Already have an account? <Text style={styles.loginLink}>Log in</Text>
+          Already have an account?
+          <TouchableOpacity onPress={() => navigation.navigate("WelcomeScreen")}>
+            <Text style={styles.loginLink}>Log in</Text>
+          </TouchableOpacity>
         </Text>
         {showThankYou && (
           <View style={styles.thankYouModal}>
@@ -370,6 +388,16 @@ const styles = StyleSheet.create({
     color: "#333",
     marginBottom: 5,
   },
+  eyeIcon: {
+    position: "absolute",
+    right: 10,
+    top: 8,
+  },
+  eyeIcon2: {
+    position: "absolute",
+    right: 10,
+    top: 29,
+  },
   input: {
     borderWidth: 1,
     borderColor: "#cccccc",
@@ -423,10 +451,12 @@ const styles = StyleSheet.create({
   },
   loginText: {
     textAlign: "center",
+    marginBottom:15,
     fontSize: 16,
     color: "#333",
   },
   loginLink: {
+    marginLeft: 20,
     color: "#FFA500",
     fontWeight: "bold",
   },
